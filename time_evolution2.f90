@@ -6,7 +6,7 @@ program main
   integer, parameter :: N=1000, Nstep=50000, ndiv=451, iteration=100
   !integer, parameter :: N=1000, Nstep=4000000, ndiv=451, iteration=1
   real(wp), parameter :: Q=1, deltat=0.002_wp, g = 3*N, rmax=4.5_wp, r_cutoff=2.5_wp
-  real(wp) :: KBT0, momentum(3, N), momentum_av(3), V, s, eta, PV, position(3, N), Ftotal(3, N),&
+  real(wp) :: KBT0, momentum(3, N), momentum_av(3), V, s, eta, PV, position(3, N), Ftotal(3, N), &
   & zeta, zeta0, time, L, Pex, P0, Tinstant, Pinstant, deltar, rho, integrand(4, ndiv),r_array(ndiv),&
   & g_array(ndiv), error_integral, theta(4), dtheta(4), r, gtgt(ndiv), alpha, L0, M, position0(3, N), momentum0(3, N), v_cutoff
   integer(i4b) :: i, imin, j
@@ -17,8 +17,8 @@ program main
   call random_seed(size=seedsize)
   allocate(seed(seedsize))
   call random_seed(get=seed)
-  ! seed = [  1632087667, -1853336134,   564385543,   814436085,  -340992037,   361556921,  -209566829,  1696273288]!test用
-  ! call random_seed(put=seed)!test用
+! seed = [  1632087667, -1853336134,   564385543,   814436085,  -340992037,   361556921,  -209566829,  1696273288]!test用
+! call random_seed(put=seed)!test用
   open(11, file = 'position, momentum, M=0.001, Nstep=50000, iteration=100, alpha=0.001,&
   &r_cutoff=2.5, theta42(16)2, KBT0=1.5,1(3)2.dat')
   open(12, file = 'L, zeta, eta, s, PV, V, M=0.001, Nstep=50000, iteration=100, alpha=0.001,&
@@ -124,12 +124,15 @@ program main
     ! end if
     position = position0
     momentum = momentum0
+    ! 時間発展開始前に Ftotal を計算
+    call get_Ftotal_Pexcess(L, N, position, Ftotal, Pex, theta, r_cutoff)
     ! L=L0
     ! V=L**3
     zeta = zeta0
     do i = 1, Nstep
       call time_evolutionNVT3(momentum, zeta, deltat)
-      call get_Ftotal_Pexcess(L,N,position, Ftotal, Pex, theta, r_cutoff)
+      ! position を書き換える time_evolutionNVT1 のあとだけ get_Ftotal_Pexcess を使うように変更
+      !call get_Ftotal_Pexcess(L,N,position, Ftotal, Pex, theta, r_cutoff)
       call time_evolutionNVT2(momentum, Ftotal, deltat)
       call time_evolutionNVT1(position, momentum, zeta, deltat, Q, g, KBT0, L)
       call get_Ftotal_Pexcess(L,N,position, Ftotal, Pex, theta, r_cutoff)
