@@ -189,10 +189,10 @@ module functions
     integer :: ndiv, i, imin
     real(wp) :: integrate_gr(4), deltar, gtgt(ndiv), g_array(ndiv), theta(4), r_array(ndiv),&
     & integrand(4, ndiv), r_cutoff
-    do i = imin, ndiv
-      r_array(i) = (i-1)*deltar
-      integrand(:, i) = r_array(i)**2*(g_array(i)-gtgt(i))*nabla_theta_u(r_array(i), theta, r_cutoff)
-    end do
+    do i = imin, ndiv 
+      r_array(i) = (i - 1) * deltar
+       integrand(:, i) = r_array(i)**2 * (g_array(i) - gtgt(i)) * nabla_theta_u(r_array(i), theta, r_cutoff)
+      end do 
     do i = 1, 4
       integrate_gr(i) = integrate(integrand(i, imin:ndiv), ndiv-imin+1, deltar)
     end do
@@ -211,7 +211,6 @@ module functions
     end do
     error_integral = integrate(error_integrand, ndiv, deltar)
   end function calculate_error_integral
-  
   
   ! 与えられた g_in(1:ndiv_in) （第i成分は位置 r = i * delta_in における動径分布関数の値）に対して、
   ! 横軸方向に scale 倍された動径分布関数の値を保持する配列 g_out(1:ndiv_out) （第i成分は位置 r = i * delta_out
